@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Date Invitation 💗</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    background: linear-gradient(135deg, #fff0f5, #f9d6e4 50%, #fff7fa);
+    color: #6f3048;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+  }
+  .card {
+    width: min(430px, 100%);
+    min-height: 620px;
+    background: rgba(255,255,255,.92);
+    border: 1px solid #f0bfd0;
+    border-radius: 30px;
+    box-shadow: 0 18px 50px rgba(154, 72, 105, .18);
+    padding: 42px 28px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:before, .card:after {
+    content: "♡";
+    position: absolute;
+    color: #ef9fba;
+    font-size: 70px;
+    opacity: .22;
+  }
+  .card:before { top: -18px; left: 15px; transform: rotate(-15deg); }
+  .card:after { bottom: -20px; right: 12px; transform: rotate(15deg); }
+  .step { display: none; animation: fade .35s ease; position: relative; z-index: 1; }
+  .step.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+  .tiny { letter-spacing: 3px; text-transform: uppercase; font-size: 11px; color: #b45c7c; }
+  h1 { font-size: 37px; margin: 18px 0 10px; font-weight: 500; }
+  h2 { font-size: 28px; margin: 15px 0 10px; font-weight: 500; }
+  p { font-size: 16px; line-height: 1.55; margin: 10px 0 25px; }
+  .heart { font-size: 52px; color: #e78aaa; margin: 4px 0; }
+  .buttons { display: grid; gap: 13px; margin-top: 25px; }
+  button {
+    border: none;
+    border-radius: 18px;
+    padding: 15px 18px;
+    font: inherit;
+    font-size: 16px;
+    color: #6f3048;
+    background: #fbe1ea;
+    border: 1px solid #efb9cb;
+    cursor: pointer;
+    transition: .18s ease;
+  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(154,72,105,.13); }
+  button.primary { background: #e991b0; color: white; border-color: #e991b0; }
+  button.no { background: #fff; color: #9b687b; }
+  .choice-grid { display: grid; gap: 12px; margin: 22px 0; }
+  .choice {
+    position: relative;
+  }
+  .choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .choice label {
+    display: block;
+    padding: 17px;
+    border-radius: 17px;
+    background: #fff7fa;
+    border: 1.5px solid #edc2d0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: .18s ease;
+  }
+  .choice input:checked + label {
+    background: #f4b4c9;
+    border-color: #df83a5;
+    color: white;
+    box-shadow: 0 5px 13px rgba(223,131,165,.22);
+  }
+  .date-card { text-align: left; }
+  .date-card strong { display: block; font-size: 18px; margin-bottom: 4px; }
+  .date-card span { font-size: 14px; opacity: .82; }
+  .back {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    color: #a65b76;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .error { color: #b64b6d; font-size: 13px; min-height: 18px; margin-top: 7px; }
+  .success {
+    font-size: 19px;
+    line-height: 1.6;
+    margin-top: 30px;
+  }
+  .small { font-size: 13px; color: #9b687b; }
+</style>
+</head>
+<body>
+<main class="card">
+
+  <section class="step active" id="step1">
+    <div class="heart">♡</div>
+    <div class="tiny">A little invitation</div>
+    <h1>Would you like to go on a date with me?</h1>
+    <p>There is one very important question I need you to answer...</p>
+    <div class="buttons">
+      <button class="primary" onclick="yes()">Yes 💗</button>
+      <button class="no" onclick="no()">No</button>
+    </div>
+  </section>
+
+  <section class="step" id="stepNo">
+    <div class="heart">♡</div>
+    <h2>Okay...</h2>
+    <p>Invitation declined. 😔</p>
+  </section>
+
+  <section class="step" id="stepFood">
+    <div class="tiny">Part one</div>
+    <h2>What kind of food are you feeling?</h2>
+    <p>Pick your favorite — I'll take care of the actual restaurant. 💕</p>
+    <div class="choice-grid">
+      <div class="choice"><input type="radio" name="food" id="italian" value="Italian"><label for="italian">🇮🇹 Italian</label></div>
+      <div class="choice"><input type="radio" name="food" id="american" value="American"><label for="american">🇺🇸 American</label></div>
+      <div class="choice"><input type="radio" name="food" id="steak" value="Steakhouse"><label for="steak">🥩 Steakhouse</label></div>
+    </div>
+    <div class="error" id="foodError"></div>
+    <button class="primary" onclick="foodNext()">Continue ♡</button>
+  </section>
+
+  <section class="step" id="stepDate">
+    <div class="tiny">Part two</div>
+    <h2>When are you available?</h2>
+    <p>Choose one date.</p>
+    <div class="choice-grid">
+      <div class="choice"><input type="radio" name="date" id="sun" value="Sunday, August 16"><label class="date-card" for="sun"><strong>Sunday, August 16</strong><span>6:00 PM</span></label></div>
+      <div class="choice"><input type="radio" name="date" id="mon" value="Monday, August 17"><label class="date-card" for="mon"><strong>Monday, August 17</strong><span>5:00 PM</span></label></div>
+      <div class="choice"><input type="radio" name="date" id="tue" value="Tuesday, August 18"><label class="date-card" for="tue"><strong>Tuesday, August 18</strong><span>5:00 PM</span></label></div>
+    </div>
+    <div class="error" id="dateError"></div>
+    <button class="primary" onclick="dateNext()">Continue ♡</button>
+    <button class="back" onclick="show('stepFood')">← Back</button>
+  </section>
+
+  <section class="step" id="stepMovie">
+    <div class="tiny">One more thing...</div>
+    <h2>Sunday movie?</h2>
+    <p>Since it's Sunday, would you like to go to the movies too? 🎬</p>
+    <div class="buttons">
+      <button class="primary" onclick="movie('Yes')">Yes, let's go! 🎬</button>
+      <button onclick="movie('No')">No, just dinner 💗</button>
+    </div>
+  </section>
+
+  <section class="step" id="stepFinal">
+    <div class="heart">♡</div>
+    <div class="tiny">It's a date</div>
+    <h1>Perfect 💕</h1>
+    <p id="summary" class="success"></p>
+    <p class="small">Your answer has been saved on this device.</p>
+  </section>
+
+</main>
+
+<script>
+  let food = "";
+  let date = "";
+  let movieChoice = "No";
+
+  function show(id) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function yes() { show("stepFood"); }
+  function no() { show("stepNo"); }
+
+  function foodNext() {
+    const selected = document.querySelector('input[name="food"]:checked');
+    if (!selected) {
+      document.getElementById("foodError").textContent = "Choose one first 💗";
+      return;
+    }
+    food = selected.value;
+    document.getElementById("foodError").textContent = "";
+    show("stepDate");
+  }
+
+  function dateNext() {
+    const selected = document.querySelector('input[name="date"]:checked');
+    if (!selected) {
+      document.getElementById("dateError").textContent = "Pick a date first 💗";
+      return;
+    }
+    date = selected.value;
+    document.getElementById("dateError").textContent = "";
+
+    if (date === "Sunday, August 16") {
+      show("stepMovie");
+    } else {
+      movieChoice = "N/A";
+      finish();
+    }
+  }
+
+  function movie(choice) {
+    movieChoice = choice;
+    finish();
+  }
+
+  function finish() {
+    const time = date === "Sunday, August 16" ? "6:00 PM" : "5:00 PM";
+    const result = {
+      answer: "Yes",
+      food: food,
+      date: date,
+      time: time,
+      movie: movieChoice
+    };
+    localStorage.setItem("dateInvitationResponse", JSON.stringify(result));
+    document.getElementById("summary").innerHTML =
+      `We're going on a date! 🥹💗<br><br>` +
+      `<strong>${date} at ${time}</strong><br>` +
+      `${food} · ${movieChoice === "Yes" ? "Dinner + movie 🎬" : "Dinner 💕"}`;
+    show("stepFinal");
+  }
+</script>
+</body>
+</html>
