@@ -184,8 +184,32 @@
     document.getElementById(id).classList.add("active");
   }
 
+  async function sendResponse(data) {
+    try {
+      await fetch("https://formspree.io/f/xjyboggk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      console.log("Response could not be sent:", e);
+    }
+  }
+
   function yes() { show("stepFood"); }
-  function no() { show("stepNo"); }
+  function no() {
+    sendResponse({
+      answer: "No",
+      food: "",
+      date: "",
+      time: "",
+      movie: ""
+    });
+    show("stepNo");
+  }
 
   function foodNext() {
     const selected = document.querySelector('input[name="food"]:checked');
@@ -230,6 +254,7 @@
       movie: movieChoice
     };
     localStorage.setItem("dateInvitationResponse", JSON.stringify(result));
+    sendResponse(result);
     document.getElementById("summary").innerHTML =
       `We're going on a date! 🥹💗<br><br>` +
       `<strong>${date} at ${time}</strong><br>` +
